@@ -13,9 +13,9 @@ spec:
     targetRevision: master
     helm:
       releaseName: commons1
-      valueFiles:
-        - $values/common1/values/values.yaml
-        - $values/common1/values/fence.yaml
+      # valueFiles:
+      #   - $values/commons1.org/values/values.yaml
+      #   - $values/commons1.org/values/fence.yaml
   destination:
     server: "https://kubernetes.default.svc"
     namespace: default
