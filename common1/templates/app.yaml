@@ -1,26 +1,35 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: gen3-commons1
-  namespace: argocd
+  name: {{ .Values.application.name | default "gen3-commons1" }}
+  namespace: {{ .Values.application.namespace | default "argocd" }}
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:
-  project: default
-  source:
-    path: helm/gen3
-    repoURL: https://github.com/uc-cdis/gen3-helm
-    targetRevision: master
+  project: {{ .Values.application.project | default "default" }}
+  sources:
+  - repoURL: {{ .Values.gen3.repository | default "https://github.com/uc-cdis/gen3-helm" }}
+    path: {{ .Values.gen3.path | default "helm/gen3" }}
+    targetRevision: {{ .Values.gen3.targetRevision | default "master" }}
     helm:
       releaseName: commons1
-      # valueFiles:
-      #   - $values/commons1.org/values/values.yaml
-      #   - $values/commons1.org/values/fence.yaml
+      valueFiles:
+      - $values/values/values.yaml
+      - $values/values/fence.yaml
+  - repoURL: {{ .Values.valuesRepository.repository | default "https://github.com/alan-walsh/argo-test" }}
+    targetRevision: {{ .Values.valuesRepository.targetRevision | default "HEAD" }}
+    ref: values
   destination:
-    server: "https://kubernetes.default.svc"
-    namespace: default
+    server: {{ .Values.destination.server | default "https://kubernetes.default.svc" }}
+    namespace: {{ .Values.destination.namespace | default "default" }}
   syncPolicy:
     syncOptions:
-      - CreateNamespace=true
+      {{- range .Values.syncPolicy.syncOptions | default (list "CreateNamespace=true") }}
+      - {{ . }}
+      {{- end }}
+    {{- if .Values.syncPolicy.automated }}
     automated:
-      selfHeal: true
+      {{- if .Values.syncPolicy.automated.selfHeal }}
+      selfHeal: {{ .Values.syncPolicy.automated.selfHeal }}
+      {{- end }}
+    {{- end }}

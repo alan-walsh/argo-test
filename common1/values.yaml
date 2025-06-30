@@ -1,0 +1,31 @@
+# Default values for the ArgoCD application chart
+# This configures the ArgoCD application that deploys Gen3
+
+# Application metadata
+application:
+  name: gen3-commons1
+  namespace: argocd
+  project: default
+
+# Gen3 Helm chart source configuration
+gen3:
+  repository: https://github.com/uc-cdis/gen3-helm
+  path: helm/gen3
+  targetRevision: master
+  
+# Values repository configuration  
+valuesRepository:
+  repository: https://github.com/alan-walsh/argo-test
+  targetRevision: HEAD
+
+# Deployment configuration
+destination:
+  server: "https://kubernetes.default.svc"
+  namespace: default
+
+# Sync policy configuration
+syncPolicy:
+  automated:
+    selfHeal: true
+  syncOptions:
+    - CreateNamespace=true
